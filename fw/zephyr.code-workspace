@@ -1,0 +1,211 @@
+{
+	"folders": [
+		{
+			"name": "fw",
+			"path": "."
+		}
+	],
+	"settings": {
+		// Local Zephyr settings. Update these two paths for each machine.
+		// Examples:
+		// Windows: "D:/zephyrproject/zephyr" and "D:/zephyrproject/.venv"
+		// Linux/macOS: "/home/user/zephyrproject/zephyr" and "/home/user/zephyrproject/.venv"
+		"zephyrWorkspace.zephyrBase": "D:/zephyrproject/zephyr",
+		"zephyrWorkspace.pythonVenvPath": "D:/zephyrproject/.venv",
+		"zephyrWorkspace.zephyrSdkInstallDir": "C:/zephyr-sdk-1.0.1",
+		"zephyrWorkspace.board": "xiao_esp32c3",
+		"zephyrWorkspace.overlayFile": "boards/xiao_esp32c3.overlay",
+		"zephyrWorkspace.buildDir": "build",
+
+		"python.defaultInterpreterPath": "${config:zephyrWorkspace.pythonVenvPath}",
+		"python.terminal.activateEnvironment": true,
+		"cmake.sourceDirectory": "${workspaceFolder:fw}",
+		"C_Cpp.default.compileCommands": "${workspaceFolder:fw}/${config:zephyrWorkspace.buildDir}/compile_commands.json",
+		"files.associations": {
+			"*.overlay": "dts",
+			"*.conf": "kconfig"
+		}
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "Zephyr: Open venv terminal",
+				"type": "process",
+				"windows": {
+					"command": "powershell.exe",
+					"args": [
+						"-NoExit",
+						"-ExecutionPolicy",
+						"Bypass",
+						"-Command",
+						"& \"${config:zephyrWorkspace.pythonVenvPath}/Scripts/Activate.ps1\"; $env:ZEPHYR_BASE=\"${config:zephyrWorkspace.zephyrBase}\"; Set-Location \"${workspaceFolder:fw}\""
+					]
+				},
+				"linux": {
+					"command": "bash",
+					"args": [
+						"-i",
+						"-c",
+						"source \"${config:zephyrWorkspace.pythonVenvPath}/bin/activate\"; export ZEPHYR_BASE=\"${config:zephyrWorkspace.zephyrBase}\"; cd \"${workspaceFolder:fw}\"; exec bash -i"
+					]
+				},
+				"osx": {
+					"command": "bash",
+					"args": [
+						"-i",
+						"-c",
+						"source \"${config:zephyrWorkspace.pythonVenvPath}/bin/activate\"; export ZEPHYR_BASE=\"${config:zephyrWorkspace.zephyrBase}\"; cd \"${workspaceFolder:fw}\"; exec bash -i"
+					]
+				},
+				"presentation": {
+					"panel": "dedicated",
+					"focus": true,
+					"clear": false
+				},
+				"problemMatcher": [],
+				"runOptions": {
+					"runOn": "folderOpen"
+				}
+			},
+			{
+				"label": "Zephyr: Build",
+				"type": "process",
+				"windows": {
+					"command": "${config:zephyrWorkspace.pythonVenvPath}/Scripts/west.exe"
+				},
+				"linux": {
+					"command": "${config:zephyrWorkspace.pythonVenvPath}/bin/west"
+				},
+				"osx": {
+					"command": "${config:zephyrWorkspace.pythonVenvPath}/bin/west"
+				},
+				"args": [
+					"build",
+					"-b",
+					"${config:zephyrWorkspace.board}",
+					"-d",
+					"${workspaceFolder:fw}/${config:zephyrWorkspace.buildDir}",
+					"${workspaceFolder:fw}",
+					"--",
+					"-DDTC_OVERLAY_FILE=${config:zephyrWorkspace.overlayFile}"
+				],
+				"options": {
+					"cwd": "${workspaceFolder:fw}",
+					"env": {
+						"ZEPHYR_BASE": "${config:zephyrWorkspace.zephyrBase}",
+						"ZEPHYR_SDK_INSTALL_DIR": "${config:zephyrWorkspace.zephyrSdkInstallDir}",
+						"ZEPHYR_TOOLCHAIN_VARIANT": "zephyr",
+						"VIRTUAL_ENV": "${config:zephyrWorkspace.pythonVenvPath}",
+						"PATH": "${config:zephyrWorkspace.pythonVenvPath}/Scripts;${env:PATH}"
+					}
+				},
+				"group": {
+					"kind": "build",
+					"isDefault": true
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "Zephyr: Build pristine",
+				"type": "process",
+				"windows": {
+					"command": "${config:zephyrWorkspace.pythonVenvPath}/Scripts/west.exe"
+				},
+				"linux": {
+					"command": "${config:zephyrWorkspace.pythonVenvPath}/bin/west"
+				},
+				"osx": {
+					"command": "${config:zephyrWorkspace.pythonVenvPath}/bin/west"
+				},
+				"args": [
+					"build",
+					"--pristine",
+					"always",
+					"-b",
+					"${config:zephyrWorkspace.board}",
+					"-d",
+					"${workspaceFolder:fw}/${config:zephyrWorkspace.buildDir}",
+					"${workspaceFolder:fw}",
+					"--",
+					"-DDTC_OVERLAY_FILE=${config:zephyrWorkspace.overlayFile}"
+				],
+				"options": {
+					"cwd": "${workspaceFolder:fw}",
+					"env": {
+						"ZEPHYR_BASE": "${config:zephyrWorkspace.zephyrBase}",
+						"ZEPHYR_SDK_INSTALL_DIR": "${config:zephyrWorkspace.zephyrSdkInstallDir}",
+						"ZEPHYR_TOOLCHAIN_VARIANT": "zephyr",
+						"VIRTUAL_ENV": "${config:zephyrWorkspace.pythonVenvPath}",
+						"PATH": "${config:zephyrWorkspace.pythonVenvPath}/Scripts;${env:PATH}"
+					}
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "Zephyr: Flash",
+				"type": "process",
+				"windows": {
+					"command": "${config:zephyrWorkspace.pythonVenvPath}/Scripts/west.exe"
+				},
+				"linux": {
+					"command": "${config:zephyrWorkspace.pythonVenvPath}/bin/west"
+				},
+				"osx": {
+					"command": "${config:zephyrWorkspace.pythonVenvPath}/bin/west"
+				},
+				"args": [
+					"flash",
+					"-d",
+					"${workspaceFolder:fw}/${config:zephyrWorkspace.buildDir}"
+				],
+				"options": {
+					"cwd": "${workspaceFolder:fw}",
+					"env": {
+						"ZEPHYR_BASE": "${config:zephyrWorkspace.zephyrBase}",
+						"ZEPHYR_SDK_INSTALL_DIR": "${config:zephyrWorkspace.zephyrSdkInstallDir}",
+						"ZEPHYR_TOOLCHAIN_VARIANT": "zephyr",
+						"VIRTUAL_ENV": "${config:zephyrWorkspace.pythonVenvPath}",
+						"PATH": "${config:zephyrWorkspace.pythonVenvPath}/Scripts;${env:PATH}"
+					}
+				},
+				"dependsOn": [
+					"Zephyr: Build"
+				],
+				"problemMatcher": []
+			},
+			{
+				"label": "Zephyr: Debug",
+				"type": "process",
+				"windows": {
+					"command": "${config:zephyrWorkspace.pythonVenvPath}/Scripts/west.exe"
+				},
+				"linux": {
+					"command": "${config:zephyrWorkspace.pythonVenvPath}/bin/west"
+				},
+				"osx": {
+					"command": "${config:zephyrWorkspace.pythonVenvPath}/bin/west"
+				},
+				"args": [
+					"debug",
+					"-d",
+					"${workspaceFolder:fw}/${config:zephyrWorkspace.buildDir}"
+				],
+				"options": {
+					"cwd": "${workspaceFolder:fw}",
+					"env": {
+						"ZEPHYR_BASE": "${config:zephyrWorkspace.zephyrBase}",
+						"ZEPHYR_SDK_INSTALL_DIR": "${config:zephyrWorkspace.zephyrSdkInstallDir}",
+						"ZEPHYR_TOOLCHAIN_VARIANT": "zephyr",
+						"VIRTUAL_ENV": "${config:zephyrWorkspace.pythonVenvPath}",
+						"PATH": "${config:zephyrWorkspace.pythonVenvPath}/Scripts;${env:PATH}"
+					}
+				},
+				"dependsOn": [
+					"Zephyr: Build"
+				],
+				"problemMatcher": []
+			}
+		]
+	}
+}

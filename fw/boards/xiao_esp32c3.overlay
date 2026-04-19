@@ -1,0 +1,6 @@
+/*
+ * Board devicetree overlay.
+ *
+ * Set zephyrWorkspace.overlayFile in temperature-node.code-workspace to this
+ * file or another overlay path relative to the fw folder.
+ */
